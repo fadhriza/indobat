@@ -58,6 +58,8 @@ func main() {
 		// Products
 		api.GET("/products", productHandler.GetAll)
 		api.POST("/products", productHandler.Create)
+		api.PUT("/products/:id", productHandler.Update)
+		api.DELETE("/products/:id", productHandler.Delete)
 
 		// Orders
 		api.POST("/order", orderHandler.CreateOrder)

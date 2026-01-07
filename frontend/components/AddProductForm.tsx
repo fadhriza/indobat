@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { Plus } from 'lucide-react'
-import { Paper, Title, TextInput, NumberInput, Button, Stack, Group, ThemeIcon } from '@mantine/core'
+import { TextInput, NumberInput, Button, Stack } from '@mantine/core'
 
 interface AddProductFormProps {
   onProductAdded: () => void
@@ -41,55 +40,46 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
   }
 
   return (
-    <Paper shadow="sm" radius="md" p="lg" withBorder>
-      <Group mb="md">
-        <ThemeIcon color="green" variant="light" size="lg">
-          <Plus size={20} />
-        </ThemeIcon>
-        <Title order={3} size="h4">Tambah Produk Baru</Title>
-      </Group>
+    <form onSubmit={handleSubmit}>
+      <Stack>
+        <TextInput
+          label="Nama Produk"
+          placeholder="Contoh: Paracetamol 500mg"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          required
+        />
 
-      <form onSubmit={handleSubmit}>
-        <Stack>
-          <TextInput
-            label="Nama Produk"
-            placeholder="Contoh: Paracetamol 500mg"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
+        <NumberInput
+          label="Stok Awal"
+          placeholder="0"
+          min={0}
+          value={formData.stock}
+          onChange={(val) => setFormData({ ...formData, stock: Number(val) })}
+          required
+        />
 
-          <NumberInput
-            label="Stok Awal"
-            placeholder="0"
-            min={0}
-            value={formData.stock}
-            onChange={(val) => setFormData({ ...formData, stock: Number(val) })}
-            required
-          />
+        <NumberInput
+          label="Harga (Rp)"
+          placeholder="0"
+          min={0}
+          step={0.01}
+          value={formData.price}
+          onChange={(val) => setFormData({ ...formData, price: Number(val) })}
+          required
+          hideControls
+        />
 
-          <NumberInput
-            label="Harga (Rp)"
-            placeholder="0"
-            min={0}
-            step={0.01}
-            value={formData.price}
-            onChange={(val) => setFormData({ ...formData, price: Number(val) })}
-            required
-            hideControls
-          />
-
-          <Button
-            type="submit"
-            loading={submitting}
-            fullWidth
-            color="green"
-            mt="xs"
-          >
-            Tambah Produk
-          </Button>
-        </Stack>
-      </form>
-    </Paper>
+        <Button
+          type="submit"
+          loading={submitting}
+          fullWidth
+          color="green"
+          mt="xs"
+        >
+          Tambah Produk
+        </Button>
+      </Stack>
+    </form>
   )
 }

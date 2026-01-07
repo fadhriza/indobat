@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { Pill, Check, ShoppingCart } from 'lucide-react'
-import AddProductForm from '@/components/AddProductForm'
 import ProductTable from '@/components/ProductTable'
 import OrderHistoryTable from '@/components/OrderHistoryTable'
 import OrderForm from '@/components/OrderForm'
@@ -17,7 +16,6 @@ export default function Home() {
       setRefreshTrigger((prev) => prev + 1)
     }
 
-    window.addEventListener('orderCreated', handleOrderCreated)
     return () => window.removeEventListener('orderCreated', handleOrderCreated)
   }, [])
 
@@ -50,9 +48,6 @@ export default function Home() {
         <Grid gutter="xl">
           {/* Left Column - Forms */}
           <Grid.Col span={{ base: 12, lg: 4 }}>
-            <Box mb="md">
-              <AddProductForm onProductAdded={handleProductAdded} />
-            </Box>
             <Box>
               <OrderForm refreshTrigger={refreshTrigger} />
             </Box>
@@ -67,7 +62,7 @@ export default function Home() {
               </Tabs.List>
 
               <Tabs.Panel value="products" pt="xs">
-                <ProductTable refreshTrigger={refreshTrigger} />
+                <ProductTable refreshTrigger={refreshTrigger} onProductUpdate={handleProductAdded} />
               </Tabs.Panel>
 
               <Tabs.Panel value="orders" pt="xs">

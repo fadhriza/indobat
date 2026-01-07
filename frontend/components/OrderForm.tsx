@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { ShoppingCart } from 'lucide-react'
-import { Paper, Title, Select, NumberInput, Button, Stack, Group, ThemeIcon, Text } from '@mantine/core'
+import { ShoppingCart, BarChart2 } from 'lucide-react'
+import { Paper, Title, Select, NumberInput, Button, Stack, Text, Tabs, Box } from '@mantine/core'
+import OrderChart from './OrderChart'
 
 interface Product {
   id: number
@@ -19,10 +20,14 @@ interface OrderFormProps {
   refreshTrigger: number
 }
 
-export default function OrderForm({ refreshTrigger }: OrderFormProps) {
+function OrderFormContent({ refreshTrigger }: OrderFormProps) {
   const [products, setProducts] = useState<Product[]>([])
-  const [formData, setFormData] = useState({
-    product_id: '',
+  const [formData, setFormData] = useState<{
+    product_id: string | null
+    quantity: number
+    discount_percent: number
+  }>({
+    product_id: null,
     quantity: 1,
     discount_percent: 0,
   })
@@ -31,8 +36,8 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`)
-      setProducts(response.data || [])
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products?limit=1000`)
+      setProducts(response.data.data || [])
     } catch (error) {
       toast.error('Gagal memuat produk')
       console.error(error)
@@ -74,7 +79,7 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/order`, payload)
       toast.success(`Order berhasil! Sisa stok: ${response.data.remaining_stock}`)
       setFormData({
-        product_id: '',
+        product_id: null,
         quantity: 1,
         discount_percent: 0,
       })
@@ -88,6 +93,7 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
     }
   }
 
+
   const selectData = products.map((product) => ({
     value: String(product.id),
     label: `${product.name} (Stok: ${product.stock})`,
@@ -95,63 +101,85 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
   }))
 
   return (
-    <Paper shadow="sm" radius="md" p="lg" withBorder>
-      <Group mb="md">
-        <ThemeIcon color="green" variant="light" size="lg">
-          <ShoppingCart size={20} />
-        </ThemeIcon>
-        <Title order={3} size="h4">Buat Order</Title>
-      </Group>
+    <form onSubmit={handleSubmit}>
+      <Stack>
+        <Select
+          label="Pilih Obat"
+          placeholder="-- Pilih Produk --"
+          data={selectData}
+          value={formData.product_id}
+          onChange={(val) => setFormData({ ...formData, product_id: val })}
+          searchable
+          required
+        />
 
-      <form onSubmit={handleSubmit}>
-        <Stack>
-          <Select
-            label="Pilih Obat"
-            placeholder="-- Pilih Produk --"
-            data={selectData}
-            value={formData.product_id}
-            onChange={(val) => setFormData({ ...formData, product_id: val || '' })}
-            searchable
-            required
-          />
+        <NumberInput
+          label="Jumlah"
+          min={1}
+          value={formData.quantity}
+          onChange={(val) => setFormData({ ...formData, quantity: Number(val) })}
+          required
+        />
 
-          <NumberInput
-            label="Jumlah"
-            min={1}
-            value={formData.quantity}
-            onChange={(val) => setFormData({ ...formData, quantity: Number(val) })}
-            required
-          />
+        <NumberInput
+          label="Diskon (%)"
+          min={0}
+          max={100}
+          step={0.01}
+          value={formData.discount_percent}
+          onChange={(val) => setFormData({ ...formData, discount_percent: Number(val) })}
+        />
 
-          <NumberInput
-            label="Diskon (%)"
-            min={0}
-            max={100}
-            step={0.01}
-            value={formData.discount_percent}
-            onChange={(val) => setFormData({ ...formData, discount_percent: Number(val) })}
-          />
+        {/* Estimated Price */}
+        <Paper bg="var(--mantine-color-blue-light)" p="md" withBorder style={{ borderColor: 'var(--mantine-color-blue-light-color)' }}>
+          <Text size="sm" c="blue" mb={4}>Estimasi Total Harga</Text>
+          <Text size="xl" fw={700} c="blue">
+            Rp {estimatedPrice.toLocaleString('id-ID')}
+          </Text>
+        </Paper>
 
-          {/* Estimated Price */}
-          <Paper bg="var(--mantine-color-blue-light)" p="md" withBorder style={{ borderColor: 'var(--mantine-color-blue-light-color)' }}>
-            <Text size="sm" c="blue" mb={4}>Estimasi Total Harga</Text>
-            <Text size="xl" fw={700} c="blue">
-              Rp {estimatedPrice.toLocaleString('id-ID')}
-            </Text>
-          </Paper>
+        <Button
+          type="submit"
+          loading={submitting}
+          fullWidth
+          color="green"
+          mt="xs"
+          disabled={!formData.product_id}
+        >
+          Buat Order
+        </Button>
+      </Stack>
+    </form>
+  )
+}
 
-          <Button
-            type="submit"
-            loading={submitting}
-            fullWidth
-            color="green"
-            mt="xs"
-            disabled={!formData.product_id}
-          >
+export default function OrderForm({ refreshTrigger }: OrderFormProps) {
+  return (
+    <Paper shadow="sm" radius="md" p="md" withBorder>
+      <Tabs defaultValue="form" variant="pills" radius="md" color="green">
+        <Tabs.List grow mb="md">
+          <Tabs.Tab value="form" leftSection={<ShoppingCart size={16} />}>
             Buat Order
-          </Button>
-        </Stack>
-      </form>
+          </Tabs.Tab>
+          <Tabs.Tab value="stats" leftSection={<BarChart2 size={16} />}>
+            Statistik
+          </Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="form">
+          <Box>
+            <Title order={3} size="h4" mb="md">Buat Order</Title>
+            <OrderFormContent refreshTrigger={refreshTrigger} />
+          </Box>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="stats">
+          <Box>
+            <Title order={3} size="h4" mb="md">Statistik Order</Title>
+            <OrderChart refreshTrigger={refreshTrigger} />
+          </Box>
+        </Tabs.Panel>
+      </Tabs>
     </Paper>
   )
 }
