@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { ShoppingCart, BarChart2 } from 'lucide-react'
-import { Paper, Title, Select, NumberInput, Button, Stack, Text, Tabs, Box } from '@mantine/core'
+import { Paper, Title, Select, NumberInput, Button, Stack, Text, Tabs, Box, Slider } from '@mantine/core'
 import OrderChart from './OrderChart'
 
 interface Product {
@@ -121,14 +121,25 @@ function OrderFormContent({ refreshTrigger }: OrderFormProps) {
           required
         />
 
-        <NumberInput
-          label="Diskon (%)"
-          min={0}
-          max={100}
-          step={0.01}
-          value={formData.discount_percent}
-          onChange={(val) => setFormData({ ...formData, discount_percent: Number(val) })}
-        />
+        <Box>
+          <Text size="sm" fw={500} mb={8}>Diskon: {formData.discount_percent}%</Text>
+          <Slider
+            min={0}
+            max={100}
+            step={1}
+            value={formData.discount_percent}
+            onChange={(val) => setFormData({ ...formData, discount_percent: val })}
+            marks={[
+              { value: 0, label: '0%' },
+              { value: 25, label: '25%' },
+              { value: 50, label: '50%' },
+              { value: 75, label: '75%' },
+              { value: 100, label: '100%' },
+            ]}
+            label={(val) => `${val}%`}
+            mb="xl"
+          />
+        </Box>
 
         {/* Estimated Price */}
         <Paper bg="var(--mantine-color-blue-light)" p="md" withBorder style={{ borderColor: 'var(--mantine-color-blue-light-color)' }}>
