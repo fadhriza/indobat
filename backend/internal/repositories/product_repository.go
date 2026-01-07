@@ -12,6 +12,7 @@ type FilterParams struct {
 	Search  string
 	SortBy  string
 	Order   string
+	GroupBy string
 }
 
 type ProductRepository interface {

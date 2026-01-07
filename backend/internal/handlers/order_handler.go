@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"indobat-backend/internal/repositories"
+	"strconv"
 )
 
 type OrderHandler struct {
@@ -33,11 +35,30 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 }
 
 func (h *OrderHandler) GetHistory(c *gin.Context) {
-	history, err := h.service.GetOrderHistory()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	sortBy := c.Query("sortBy")
+	order := c.Query("order")
+	groupBy := c.Query("groupBy")
+
+	params := repositories.FilterParams{
+		Page:    page,
+		Limit:   limit,
+		SortBy:  sortBy,
+		Order:   order,
+		GroupBy: groupBy,
+	}
+
+	history, total, err := h.service.GetOrderHistory(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, history)
+	c.JSON(http.StatusOK, gin.H{
+		"data":  history,
+		"total": total,
+		"page":  page,
+		"limit": limit,
+	})
 }

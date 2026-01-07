@@ -33,8 +33,9 @@ export default function OrderChart({ refreshTrigger }: OrderChartProps) {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders`)
-            const data: Transaction[] = response.data || []
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders?limit=1000`)
+            const responseData = response.data
+            const data: Transaction[] = Array.isArray(responseData) ? responseData : (responseData.data || [])
             setTransactions(data)
         } catch (error) {
             console.error(error)
@@ -158,7 +159,7 @@ export default function OrderChart({ refreshTrigger }: OrderChartProps) {
                                 <XAxis dataKey="date" fontSize={11} tickLine={false} axisLine={false} />
                                 <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
                                 <Tooltip
-                                    formatter={(value: number) => [`Rp ${(value || 0).toLocaleString('id-ID')}`, 'Pendapatan']}
+                                    formatter={(value: number | undefined) => [`Rp ${(value || 0).toLocaleString('id-ID')}`, 'Pendapatan']}
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Bar dataKey="revenue" fill="var(--mantine-color-green-filled)" radius={[4, 4, 0, 0]} />

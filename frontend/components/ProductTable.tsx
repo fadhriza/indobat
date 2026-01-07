@@ -139,16 +139,7 @@ export default function ProductTable({ refreshTrigger, onProductUpdate }: Produc
           }}
           style={{ flex: 1 }}
         />
-        <Select
-          value={String(limit)}
-          onChange={(val) => {
-            setLimit(Number(val))
-            setPage(1)
-          }}
-          data={['5', '10', '20', '50']}
-          w={80}
-          allowDeselect={false}
-        />
+
       </Group>
 
       <Modal opened={opened} onClose={close} title={editingProduct ? "Edit Produk" : "Tambah Produk Baru"} centered>
@@ -270,14 +261,24 @@ export default function ProductTable({ refreshTrigger, onProductUpdate }: Produc
       }
 
       {total > 0 && (
-        <Center p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+        <Group justify="space-between" p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+          <Select
+            value={String(limit)}
+            onChange={(val) => {
+              setLimit(Number(val))
+              setPage(1)
+            }}
+            data={['5', '10', '20', '50']}
+            w={80}
+            allowDeselect={false}
+          />
           <Pagination
             total={Math.ceil(total / limit)}
             value={page}
             onChange={setPage}
             color="green"
           />
-        </Center>
+        </Group>
       )}
 
     </Paper >

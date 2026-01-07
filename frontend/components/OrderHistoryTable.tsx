@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { RefreshCw, ShoppingCart } from 'lucide-react'
-import { Table, Button, Badge, Paper, Group, Title, Loader, Text, Center, Stack } from '@mantine/core'
+import { RefreshCw, ShoppingCart, ArrowUp, ArrowDown } from 'lucide-react'
+import { Table, Button, Badge, Paper, Group, Title, Loader, Text, Center, Stack, Pagination, Switch, Select } from '@mantine/core'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 
@@ -31,11 +31,38 @@ export default function OrderHistoryTable({ refreshTrigger }: OrderHistoryTableP
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
 
+    // Pagination & Filter States
+    const [page, setPage] = useState(1)
+    const [total, setTotal] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [groupByProduct, setGroupByProduct] = useState(false)
+    const [sortBy, setSortBy] = useState<string>('created_at')
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+
+    const handleSort = (field: string) => {
+        if (sortBy === field) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortBy(field)
+            setSortOrder('asc') // Default asc for new field? Usually desc for date. Let's start asc.
+        }
+    }
+
     const fetchOrders = async () => {
         try {
             setLoading(true)
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders`)
-            setOrders(response.data || [])
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                sortBy: sortBy,
+                order: sortOrder,
+                groupBy: groupByProduct ? 'product' : ''
+            })
+
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders?${params}`)
+            const responseData = response.data
+            setOrders(Array.isArray(responseData) ? responseData : (responseData.data || []))
+            setTotal(responseData.total || 0)
         } catch (error) {
             toast.error('Gagal memuat riwayat pesanan')
             console.error(error)
@@ -45,22 +72,34 @@ export default function OrderHistoryTable({ refreshTrigger }: OrderHistoryTableP
     }
 
     useEffect(() => {
+        setPage(1) // Reset page when grouping changes
+    }, [groupByProduct])
+
+    useEffect(() => {
         fetchOrders()
-    }, [refreshTrigger])
+    }, [refreshTrigger, page, limit, sortBy, sortOrder, groupByProduct])
 
     return (
         <Paper shadow="sm" radius="md" withBorder>
             <Group justify="space-between" p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
                 <Title order={3} size="h4">Riwayat Pesanan</Title>
-                <Button
-                    onClick={fetchOrders}
-                    loading={loading}
-                    leftSection={<RefreshCw size={18} />}
-                    variant="light"
-                    color="green"
-                >
-                    Refresh
-                </Button>
+                <Group>
+                    <Switch
+                        label="Kelompokkan per Produk"
+                        checked={groupByProduct}
+                        onChange={(event) => setGroupByProduct(event.currentTarget.checked)}
+                        color="green"
+                    />
+                    <Button
+                        onClick={fetchOrders}
+                        loading={loading}
+                        leftSection={<RefreshCw size={18} />}
+                        variant="light"
+                        color="green"
+                    >
+                        Refresh
+                    </Button>
+                </Group>
             </Group>
 
             {loading && orders.length === 0 ? (
@@ -81,17 +120,51 @@ export default function OrderHistoryTable({ refreshTrigger }: OrderHistoryTableP
                 <Table horizontalSpacing="md" verticalSpacing="sm" striped highlightOnHover>
                     <Table.Thead>
                         <Table.Tr>
-                            <Table.Th>ID</Table.Th>
+                            {!groupByProduct && (
+                                <Table.Th
+                                    onClick={() => handleSort('id')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <Group gap="xs">
+                                        ID
+                                        {sortBy === 'id' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                                    </Group>
+                                </Table.Th>
+                            )}
                             <Table.Th>Produk</Table.Th>
-                            <Table.Th>Qty</Table.Th>
-                            <Table.Th>Total</Table.Th>
-                            <Table.Th>Waktu</Table.Th>
+                            <Table.Th
+                                onClick={() => handleSort('quantity')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <Group gap="xs">
+                                    {groupByProduct ? 'Total Qty' : 'Qty'}
+                                    {sortBy === 'quantity' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                                </Group>
+                            </Table.Th>
+                            <Table.Th
+                                onClick={() => handleSort('total_price')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <Group gap="xs">
+                                    Total
+                                    {sortBy === 'total_price' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                                </Group>
+                            </Table.Th>
+                            <Table.Th
+                                onClick={() => handleSort('created_at')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <Group gap="xs">
+                                    {groupByProduct ? 'Terakhir Order' : 'Waktu'}
+                                    {sortBy === 'created_at' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                                </Group>
+                            </Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        {orders.map((order) => (
-                            <Table.Tr key={order.id}>
-                                <Table.Td>{order.id}</Table.Td>
+                        {orders.map((order, index) => (
+                            <Table.Tr key={order.id || index}>
+                                {!groupByProduct && <Table.Td>{order.id}</Table.Td>}
                                 <Table.Td style={{ fontWeight: 500 }}>
                                     {order.product?.name || `Product #${order.product_id}`}
                                 </Table.Td>
@@ -112,6 +185,27 @@ export default function OrderHistoryTable({ refreshTrigger }: OrderHistoryTableP
                         ))}
                     </Table.Tbody>
                 </Table>
+            )}
+
+            {total > 0 && (
+                <Group justify="space-between" p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                    <Select
+                        value={String(limit)}
+                        onChange={(val) => {
+                            setLimit(Number(val))
+                            setPage(1)
+                        }}
+                        data={['5', '10', '20', '50']}
+                        w={80}
+                        allowDeselect={false}
+                    />
+                    <Pagination
+                        total={Math.ceil(total / limit)}
+                        value={page}
+                        onChange={setPage}
+                        color="green"
+                    />
+                </Group>
             )}
         </Paper>
     )

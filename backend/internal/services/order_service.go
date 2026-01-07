@@ -11,7 +11,7 @@ import (
 
 type OrderService interface {
 CreateOrder(req *models.CreateOrderRequest) (*models.OrderResponse, error)
-GetOrderHistory() ([]models.Transaction, error)
+	GetOrderHistory(params repositories.FilterParams) ([]models.Transaction, int64, error)
 }
 
 type orderService struct {
@@ -86,6 +86,6 @@ return nil, err
 return &response, nil
 }
 
-func (s *orderService) GetOrderHistory() ([]models.Transaction, error) {
-return s.txRepo.GetAll()
+func (s *orderService) GetOrderHistory(params repositories.FilterParams) ([]models.Transaction, int64, error) {
+	return s.txRepo.GetAll(params)
 }
