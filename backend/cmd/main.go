@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"indobat-backend/internal/config"
 	"indobat-backend/internal/handlers"
 	"indobat-backend/internal/models"
@@ -34,8 +36,13 @@ func main() {
 	r := gin.Default()
 
 	// CORS
+	clientURL := os.Getenv("CLIENT_URL")
+	if clientURL == "" {
+		clientURL = "http://localhost:3000"
+	}
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001"},
+		AllowOrigins:     []string{clientURL},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		AllowCredentials: true,

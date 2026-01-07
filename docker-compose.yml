@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: indobat-postgres
+    environment:
+      POSTGRES_USER: indobat_user
+      POSTGRES_PASSWORD: indobat_password
+      POSTGRES_DB: indobat_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - indobat-network
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: indobat-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=indobat_user
+      - DB_PASSWORD=indobat_password
+      - DB_NAME=indobat_db
+      - CLIENT_URL=http://localhost:3000
+      - GIN_MODE=release
+    depends_on:
+      - postgres
+    networks:
+      - indobat-network
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: indobat-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - indobat-network
+    restart: always
+
+networks:
+  indobat-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

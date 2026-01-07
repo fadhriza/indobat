@@ -25,7 +25,7 @@ export default function ProductTable({ refreshTrigger }: ProductTableProps) {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost:8080/api/products')
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
       setProducts(response.data || [])
     } catch (error) {
       toast.error('Gagal memuat produk')
