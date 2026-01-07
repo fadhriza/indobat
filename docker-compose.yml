@@ -29,7 +29,7 @@ services:
       - DB_USER=indobat_user
       - DB_PASSWORD=indobat_password
       - DB_NAME=indobat_db
-      - CLIENT_URL=http://localhost:3000
+      - CLIENT_URL=* # Allow any client (Docker/Network)
       - GIN_MODE=release
     depends_on:
       - postgres
@@ -45,7 +45,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - BACKEND_URL=http://backend:8080
+      - PORT=3000
     depends_on:
       - backend
     networks:

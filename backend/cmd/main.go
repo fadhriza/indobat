@@ -36,16 +36,10 @@ func main() {
 	// Setup Router
 	r := gin.Default()
 
-	// CORS
-	clientURL := os.Getenv("CLIENT_URL")
-	if clientURL == "" {
-		clientURL = "http://localhost:3000"
-	}
-
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{clientURL},
+		AllowOrigins:     []string{"*"}, // Allow all origins for easier docker/network access
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
 
