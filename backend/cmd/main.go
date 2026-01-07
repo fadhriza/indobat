@@ -31,6 +31,7 @@ func main() {
 	// Init Handlers
 	productHandler := handlers.NewProductHandler(productService)
 	orderHandler := handlers.NewOrderHandler(orderService)
+	healthHandler := handlers.NewHealthHandler()
 
 	// Setup Router
 	r := gin.Default()
@@ -49,8 +50,11 @@ func main() {
 	}))
 
 	// Routes
-	api := r.Group("/api")
+	api := r.Group("/api/v1")
 	{
+		// Health
+		api.GET("/health", healthHandler.Check)
+
 		// Products
 		api.GET("/products", productHandler.GetAll)
 		api.POST("/products", productHandler.Create)

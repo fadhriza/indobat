@@ -30,7 +30,7 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`)
       setProducts(response.data || [])
     } catch (error) {
       toast.error('Gagal memuat produk')
@@ -65,7 +65,7 @@ export default function OrderForm({ refreshTrigger }: OrderFormProps) {
 
     try {
       setSubmitting(true)
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/order`, formData)
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/order`, formData)
       toast.success(`Order berhasil! Sisa stok: ${response.data.remaining_stock}`)
       setFormData({
         product_id: 0,

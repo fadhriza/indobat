@@ -27,7 +27,7 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
 
     try {
       setSubmitting(true)
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, formData)
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`, formData)
       toast.success('Produk berhasil ditambahkan')
       setFormData({ name: '', stock: 0, price: 0 })
       onProductAdded()

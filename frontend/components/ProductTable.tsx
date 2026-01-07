@@ -25,7 +25,7 @@ export default function ProductTable({ refreshTrigger }: ProductTableProps) {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`)
       setProducts(response.data || [])
     } catch (error) {
       toast.error('Gagal memuat produk')
@@ -83,11 +83,10 @@ export default function ProductTable({ refreshTrigger }: ProductTableProps) {
                   <td className="px-6 py-4 text-sm text-gray-700 font-medium">{product.name}</td>
                   <td className="px-6 py-4 text-sm">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        product.stock > 0
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${product.stock > 0
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
-                      }`}
+                        }`}
                     >
                       {product.stock}
                     </span>
