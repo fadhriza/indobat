@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Pill, Check, ShoppingCart } from 'lucide-react'
+import { Pill, ShoppingCart } from 'lucide-react'
 import ProductTable from '@/components/ProductTable'
 import OrderHistoryTable from '@/components/OrderHistoryTable'
 import OrderForm from '@/components/OrderForm'
 import ThemeToggle from '@/components/ThemeToggle'
-import { Container, Grid, Title, Text, Group, ThemeIcon, Paper, List, Box, Tabs } from '@mantine/core'
+import { Container, Grid, Title, Text, Group, ThemeIcon, Paper, Box, Tabs } from '@mantine/core'
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
