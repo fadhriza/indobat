@@ -31,3 +31,13 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *OrderHandler) GetHistory(c *gin.Context) {
+	history, err := h.service.GetOrderHistory()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, history)
+}

@@ -5,6 +5,7 @@ import "time"
 type Transaction struct {
 	ID              uint      `gorm:"primaryKey" json:"id"`
 	ProductID       uint      `gorm:"not null" json:"product_id"`
+	Product         Product   `gorm:"foreignKey:ProductID" json:"product,omitempty"`
 	Quantity        int       `gorm:"not null" json:"quantity"`
 	DiscountPercent float64   `json:"discount_percent"`
 	UnitPrice       float64   `gorm:"not null" json:"unit_price"`

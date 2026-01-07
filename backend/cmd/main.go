@@ -61,6 +61,7 @@ func main() {
 
 		// Orders
 		api.POST("/order", orderHandler.CreateOrder)
+		api.GET("/orders", orderHandler.GetHistory)
 	}
 
 	r.Run(":8080")

@@ -4,7 +4,7 @@ import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mini-Indobat Inventory System',
+  title: 'Indobat Inventory',
   description: 'Sistem manajemen stok sederhana untuk PBF Farmasi',
 }
 
