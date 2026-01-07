@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Pill } from 'lucide-react'
+import { Pill, Check } from 'lucide-react'
 import AddProductForm from '@/components/AddProductForm'
 import ProductTable from '@/components/ProductTable'
 import OrderForm from '@/components/OrderForm'
+import ThemeToggle from '@/components/ThemeToggle'
+import { Container, Grid, Title, Text, Group, ThemeIcon, Paper, List, Box } from '@mantine/core'
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -23,60 +25,72 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <Box mih="100vh" bg="var(--mantine-color-body)">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-indobat-primary p-2 rounded-lg">
-              <Pill size={32} className="text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Mini-Indobat Inventory</h1>
-              <p className="text-gray-600 text-sm mt-1">Sistem Manajemen Stok Farmasi</p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Paper shadow="sm" radius={0} p="md" withBorder>
+        <Container size="xl">
+          <Group justify="space-between">
+            <Group>
+              <ThemeIcon size={48} radius="md" color="green">
+                <Pill size={32} />
+              </ThemeIcon>
+              <div>
+                <Title order={1} size="h2">Mini-Indobat Inventory</Title>
+                <Text c="dimmed" size="sm">Sistem Manajemen Stok Farmasi</Text>
+              </div>
+            </Group>
+            <ThemeToggle />
+          </Group>
+        </Container>
+      </Paper>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <Container size="xl" py="xl">
+        <Grid gutter="xl">
           {/* Left Column - Forms */}
-          <div className="lg:col-span-1 space-y-6">
-            <AddProductForm onProductAdded={handleProductAdded} />
-            <OrderForm refreshTrigger={refreshTrigger} />
-          </div>
+          <Grid.Col span={{ base: 12, lg: 4 }}>
+            <Box mb="md">
+              <AddProductForm onProductAdded={handleProductAdded} />
+            </Box>
+            <Box>
+              <OrderForm refreshTrigger={refreshTrigger} />
+            </Box>
+          </Grid.Col>
 
           {/* Right Column - Product Table */}
-          <div className="lg:col-span-2">
+          <Grid.Col span={{ base: 12, lg: 8 }}>
             <ProductTable refreshTrigger={refreshTrigger} />
-          </div>
-        </div>
+          </Grid.Col>
+        </Grid>
 
         {/* Info Section */}
-        <div className="mt-12 bg-white rounded-lg shadow-md p-6 border-l-4 border-indobat-primary">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Fitur Keamanan</h3>
-          <ul className="space-y-2 text-gray-700">
-            <li className="flex items-start gap-3">
-              <span className="text-indobat-primary font-bold">✓</span>
-              <span><strong>Race Condition Safe:</strong> Menggunakan database locking untuk mencegah stok negatif saat transaksi concurrent</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-indobat-primary font-bold">✓</span>
-              <span><strong>Real-time Stock Tracking:</strong> Stok diperbarui secara real-time setelah setiap transaksi</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-indobat-primary font-bold">✓</span>
-              <span><strong>Diskon Otomatis:</strong> Hitung harga dengan diskon persentase yang fleksibel</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-indobat-primary font-bold">✓</span>
-              <span><strong>Validasi Input:</strong> Semua input divalidasi untuk memastikan data konsisten</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </main>
+        <Paper mt={48} p="lg" radius="md" shadow="sm" withBorder style={{ borderLeft: '4px solid var(--mantine-color-green-filled)' }}>
+          <Title order={3} size="h4" mb="xs">Fitur Keamanan</Title>
+          <List
+            spacing="xs"
+            size="sm"
+            center
+            icon={
+              <ThemeIcon color="green" size={20} radius="xl">
+                <Check size={12} />
+              </ThemeIcon>
+            }
+          >
+            <List.Item>
+              <Text span fw={700}>Race Condition Safe:</Text> Menggunakan database locking untuk mencegah stok negatif saat transaksi concurrent
+            </List.Item>
+            <List.Item>
+              <Text span fw={700}>Real-time Stock Tracking:</Text> Stok diperbarui secara real-time setelah setiap transaksi
+            </List.Item>
+            <List.Item>
+              <Text span fw={700}>Diskon Otomatis:</Text> Hitung harga dengan diskon persentase yang fleksibel
+            </List.Item>
+            <List.Item>
+              <Text span fw={700}>Validasi Input:</Text> Semua input divalidasi untuk memastikan data konsisten
+            </List.Item>
+          </List>
+        </Paper>
+      </Container>
+    </Box>
   )
 }
