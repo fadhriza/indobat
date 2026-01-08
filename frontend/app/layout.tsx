@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const theme = createTheme({
   primaryColor: 'green',
-  defaultRadius: 9999,
+  defaultRadius: 'md',
 });
 
 export default function RootLayout({

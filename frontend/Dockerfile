@@ -21,6 +21,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Accept BACKEND_URL as build argument and set as environment variable
+ARG BACKEND_URL=http://backend:8080
+ENV BACKEND_URL=$BACKEND_URL
 
 # Set API URL to empty to use relative paths (proxied by Next.js)
 ENV NEXT_PUBLIC_API_URL=""
@@ -55,5 +58,6 @@ EXPOSE 3000
 ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
+ENV BACKEND_URL "http://backend:8080"
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "echo \"BACKEND_URL is: $BACKEND_URL\"; node server.js"]
